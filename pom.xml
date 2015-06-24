@@ -69,6 +69,7 @@
 		<slf4j.version>1.6.1</slf4j.version>
 		<commons.io.version>2.4</commons.io.version>
 		<commons.lang.version>2.6</commons.lang.version>
+		<commons.lang3.version>3.4</commons.lang3.version>
 		<jsr305.version>2.0.2</jsr305.version>
 		<validation.api.version>1.1.0.Final</validation.api.version>
 		<guava.version>17.0</guava.version>
@@ -98,6 +99,11 @@
 				<groupId>commons-lang</groupId>
 				<artifactId>commons-lang</artifactId>
 				<version>${commons.lang.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-lang3</artifactId>
+				<version>${commons.lang3.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.google.code.findbugs</groupId>

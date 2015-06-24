@@ -15,7 +15,7 @@ import java.util.TreeSet;
 import javax.portlet.PortletPreferences;
 import javax.portlet.ReadOnlyException;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.collect.ImmutableMap;
 

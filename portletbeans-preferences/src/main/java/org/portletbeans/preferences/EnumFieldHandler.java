@@ -5,7 +5,7 @@ import javax.portlet.ReadOnlyException;
 
 import lombok.RequiredArgsConstructor;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Handles the conversion of enum fields to / from preference fields.

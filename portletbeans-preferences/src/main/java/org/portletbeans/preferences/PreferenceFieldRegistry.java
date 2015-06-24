@@ -1,6 +1,7 @@
 package org.portletbeans.preferences;
 
 import java.io.Serializable;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -18,8 +19,8 @@ import javax.portlet.ReadOnlyException;
 
 import lombok.Getter;
 
-import org.apache.commons.lang.ClassUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.ClassUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.portletbeans.util.ClassUtil;
 import org.reflections.Reflections;
 
@@ -39,6 +40,30 @@ public final class PreferenceFieldRegistry {
 	@Getter
 	private static final class PreferenceFieldDescription<T> {
 
+		private static final PreferenceField DEFAULT_PREFERENCE_FIELD = new PreferenceField() {
+
+			@Override
+			public Class<? extends Annotation> annotationType() {
+				return PreferenceField.class;
+			}
+
+			@Override
+			public String defaultValue() {
+				return null;
+			}
+
+			@Override
+			@SuppressWarnings("rawtypes")
+			public Class<PreferenceFieldHandler> handler() {
+				return PreferenceFieldHandler.class;
+			}
+
+			@Override
+			public String value() {
+				return "";
+			}
+		};
+
 		private final Field field;
 
 		private final String key;
@@ -52,7 +77,11 @@ public final class PreferenceFieldRegistry {
 		PreferenceFieldDescription(final Field field) {
 			this.field = field;
 			field.setAccessible(true);
-			final PreferenceField preferenceField = field.getAnnotation(PreferenceField.class);
+			PreferenceField preferenceField = field.getAnnotation(PreferenceField.class);
+			if (preferenceField == null) {
+				preferenceField = DEFAULT_PREFERENCE_FIELD;
+			}
+
 			this.key = StringUtils.isBlank(preferenceField.value()) ? field.getName() : preferenceField.value();
 			this.defaultValue = StringUtils.isBlank(preferenceField.defaultValue()) ? null : preferenceField
 					.defaultValue();
@@ -98,7 +127,7 @@ public final class PreferenceFieldRegistry {
 
 	private static Map<Class<?>, Class<? extends PreferenceFieldHandler<?>>> createDefaultHandlers() {
 		final Map<Class<?>, Class<? extends PreferenceFieldHandler<?>>> result = new HashMap<>();
-		final Set<Class<? extends PreferenceFieldHandler<?>>> handlerTypes = new Reflections()
+		final Set<Class<? extends PreferenceFieldHandler<?>>> handlerTypes = new Reflections("")
 				.getSubTypesOf((Class<PreferenceFieldHandler<?>>) (Class<?>) PreferenceFieldHandler.class);
 		for (final Class<? extends PreferenceFieldHandler<?>> handlerType : handlerTypes) {
 			if (!Modifier.isAbstract(handlerType.getModifiers())) {
@@ -206,9 +235,10 @@ public final class PreferenceFieldRegistry {
 		List<PreferenceFieldDescription<?>> fields = PREFERENCE_FIELDS.get(c);
 		if (fields == null) {
 			fields = getPreferenceFields(c.getSuperclass());
+			final boolean isPreferenceEntity = c.isAnnotationPresent(PreferenceEntity.class);
 			boolean modified = false;
 			for (final Field field : c.getDeclaredFields()) {
-				if (field.isAnnotationPresent(PreferenceField.class)) {
+				if (isPreferenceField(field, isPreferenceEntity)) {
 					if (!modified) {
 						fields = new ArrayList<>(fields);
 						modified = true;
@@ -222,16 +252,15 @@ public final class PreferenceFieldRegistry {
 		return fields;
 	}
 
-	/**
-	 * Loads initial values for an object.
-	 *
-	 * @param preferences
-	 *            the current portlet preferences
-	 * @param instance
-	 *            the current instance to initialize
-	 */
-	public static void load(final PortletPreferences preferences, final Object instance) {
-		load(preferences, null, instance);
+	private static boolean isPreferenceField(final Field field, final boolean isPreferenceEntity) {
+		final int modifiers = field.getModifiers();
+		if (Modifier.isStatic(modifiers)) {
+			return false;
+		}
+		if (field.isAnnotationPresent(PreferenceField.class)) {
+			return true;
+		}
+		return isPreferenceEntity && !Modifier.isTransient(modifiers) && !field.isAnnotationPresent(Transient.class);
 	}
 
 	/**
@@ -243,11 +272,26 @@ public final class PreferenceFieldRegistry {
 	 *            the prefix for all used keys - useful if a collection of elements was stored
 	 * @param instance
 	 *            the current instance to initialize
+	 * @return the loaded instance (for chaining purposes)
 	 */
-	public static void load(final PortletPreferences preferences, final String prefix, final Object instance) {
+	public static <T> T load(final PortletPreferences preferences, final String prefix, final T instance) {
 		for (final PreferenceFieldDescription<?> field : getPreferenceFields(instance.getClass())) {
 			field.load(preferences, prefix, instance);
 		}
+		return instance;
+	}
+
+	/**
+	 * Loads initial values for an object.
+	 *
+	 * @param preferences
+	 *            the current portlet preferences
+	 * @param instance
+	 *            the current instance to initialize
+	 * @return the loaded instance (for chaining purposes)
+	 */
+	public static <T> T load(final PortletPreferences preferences, final T instance) {
+		return load(preferences, null, instance);
 	}
 
 	/**
