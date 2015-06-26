@@ -1,5 +1,3 @@
-<div style="float: right">
-  <img alt="Logo" src="http://portletbeans.org/images/32x32.png">
-</div>
+![Logo](http://portletbeans.org/images/32x32.png){.float-right}
 # Portletbeans
 A Framework for Java Beans in Portlets.
