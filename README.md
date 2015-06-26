@@ -1,3 +1,2 @@
-![Logo](http://portletbeans.org/images/32x32.png){.float-right}
-# Portletbeans
+# Portletbeans <img align="right" src="http://portletbeans.org/images/64x64.png" alt="Logo">
 A Framework for Java Beans in Portlets.
