@@ -51,10 +51,10 @@ public class PreferenceTest {
 		assertThat(resultEntity.getChildProperty().getSubchild().getName()).isNull();
 		assertThat(resultEntity.getChildProperty().getSubchild().getSubchild()).isNull();
 
-		assertThat(resultEntity.getListProperty().get(0).getName()).isEqualTo(
-				testEntity.getListProperty().get(0).getName());
-		assertThat(resultEntity.getListProperty().get(1).getName()).isEqualTo(
-				testEntity.getListProperty().get(1).getName());
+		assertThat(resultEntity.getListProperty().get(0).getName())
+				.isEqualTo(testEntity.getListProperty().get(0).getName());
+		assertThat(resultEntity.getListProperty().get(1).getName())
+				.isEqualTo(testEntity.getListProperty().get(1).getName());
 
 		assertThat(resultEntity.getMapProperty().get("child3").getName()).isEqualTo("3");
 		assertThat(resultEntity.getMapProperty().get("child4").getName()).isEqualTo("");
@@ -81,9 +81,20 @@ public class PreferenceTest {
 		testEntity.getNumberMap().put(1, 2.3);
 		testEntity.getNumberMap().put(4, 5.6);
 
-		// Store and load the preferences
+		// Store and test the preferences
 		final PortletPreferences preferences = new TestPreferences();
 		PreferenceFieldRegistry.store(preferences, testEntity);
+
+		assertThat(preferences.getValue("stringProperty", "")).isEqualTo("Testing");
+		assertThat(preferences.getValue("booleanProperty", "false")).isEqualTo("true");
+		assertThat(preferences.getValue("charProperty", "")).isEqualTo("c");
+		assertThat(preferences.getValue("dateProperty", "")).isEqualTo("86400000");
+		assertThat(preferences.getValue("doubleProperty", "")).isEqualTo("12.3456");
+		assertThat(preferences.getValue("intProperty", "")).isEqualTo("7890");
+		assertThat(preferences.getValue("transient1", "")).isEqualTo("");
+		assertThat(preferences.getValue("transient2", "")).isEqualTo("");
+
+		// Load the preferences
 		final SimpleTestEntity resultEntity = PreferenceFieldRegistry.load(preferences, new SimpleTestEntity());
 
 		// Test the loaded result object
@@ -96,10 +107,10 @@ public class PreferenceTest {
 		assertThat(resultEntity.getTransient1()).isNull();
 		assertThat(resultEntity.getTransient2()).isNull();
 
-		assertThat(resultEntity.getStringsProperty()).containsExactly(
-				testEntity.getStringsProperty().toArray(new String[0]));
-		assertThat(resultEntity.getFinalProperties()).containsExactly(
-				testEntity.getFinalProperties().toArray(new String[0]));
+		assertThat(resultEntity.getStringsProperty())
+				.containsExactly(testEntity.getStringsProperty().toArray(new String[0]));
+		assertThat(resultEntity.getFinalProperties())
+				.containsExactly(testEntity.getFinalProperties().toArray(new String[0]));
 		assertThat(resultEntity.getNumberMap()).containsExactly(entry(1, 2.3), entry(4, 5.6));
 	}
 

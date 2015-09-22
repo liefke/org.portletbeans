@@ -32,9 +32,8 @@ public final class ToStringFieldHandler<T> implements PreferenceFieldHandler<T> 
 			return this.constructor.newInstance(value);
 		} catch (final InstantiationException | IllegalAccessException | IllegalArgumentException
 				| InvocationTargetException e) {
-			log.error(
-					"Could not convert the preference value for " + key + " to a "
-							+ this.constructor.getDeclaringClass() + ": " + value, e);
+			log.error("Could not convert the preference value for " + key + " to a "
+					+ this.constructor.getDeclaringClass() + ": " + value, e);
 			return null;
 		}
 	}

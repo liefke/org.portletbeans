@@ -17,12 +17,12 @@ import java.util.Set;
 import javax.portlet.PortletPreferences;
 import javax.portlet.ReadOnlyException;
 
-import lombok.Getter;
-
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.portletbeans.util.ClassUtil;
 import org.reflections.Reflections;
+
+import lombok.Getter;
 
 /**
  * Manages classes with {@link PreferenceField} annotations.
@@ -83,8 +83,8 @@ public final class PreferenceFieldRegistry {
 			}
 
 			this.key = StringUtils.isBlank(preferenceField.value()) ? field.getName() : preferenceField.value();
-			this.defaultValue = StringUtils.isBlank(preferenceField.defaultValue()) ? null : preferenceField
-					.defaultValue();
+			this.defaultValue = StringUtils.isBlank(preferenceField.defaultValue()) ? null
+					: preferenceField.defaultValue();
 			this.handler = findHandler(field, (Class<? extends PreferenceFieldHandler<T>>) preferenceField.handler());
 			this.isFinal = Modifier.isFinal(field.getModifiers());
 			if (this.isFinal && !(this.handler instanceof FinalFieldHandler)) {
@@ -98,8 +98,8 @@ public final class PreferenceFieldRegistry {
 				if (this.isFinal) {
 					final T value = (T) this.field.get(instance);
 					if (value != null) {
-						((FinalFieldHandler<T>) this.handler)
-								.load(value, preferences, preferenceKey, this.defaultValue);
+						((FinalFieldHandler<T>) this.handler).load(value, preferences, preferenceKey,
+								this.defaultValue);
 					}
 				} else {
 					final T value = this.handler.load(preferences, preferenceKey, this.defaultValue);
@@ -124,6 +124,15 @@ public final class PreferenceFieldRegistry {
 			}
 		}
 	}
+
+	private static final Map<Class<?>, List<PreferenceFieldDescription<?>>> PREFERENCE_FIELDS = Collections
+			.synchronizedMap(new HashMap<Class<?>, List<PreferenceFieldDescription<?>>>());
+
+	private static final Map<Class<? extends PreferenceFieldHandler<?>>, PreferenceFieldHandler<?>> HANDLERS = Collections
+			.synchronizedMap(new HashMap<Class<? extends PreferenceFieldHandler<?>>, PreferenceFieldHandler<?>>());
+
+	private static final Map<Class<?>, Class<? extends PreferenceFieldHandler<?>>> DEFAULT_HANDLERS = Collections
+			.unmodifiableMap(createDefaultHandlers());
 
 	private static Map<Class<?>, Class<? extends PreferenceFieldHandler<?>>> createDefaultHandlers() {
 		final Map<Class<?>, Class<? extends PreferenceFieldHandler<?>>> result = new HashMap<>();
@@ -151,21 +160,23 @@ public final class PreferenceFieldRegistry {
 	 * @throws IllegalArgumentException
 	 *             if we don't know how to handle the given field
 	 */
-	static <T, E extends Enum<E>> PreferenceFieldHandler<T> findDefaultHandler(final Field field, final Class<?> type) {
+	static <T, E extends Enum<E>> PreferenceFieldHandler<T> findDefaultHandler(final Field field, final Class<T> type) {
 		// Inspect the field
 		final Class<? extends PreferenceFieldHandler<?>> defaultHandler = DEFAULT_HANDLERS.get(type);
 		if (defaultHandler != null) {
 			return (PreferenceFieldHandler<T>) findExplicitHandler(field, defaultHandler);
 		} else if (type.isAnnotationPresent(PreferenceEntity.class)) {
-			return new PreferenceEntityHandler<>((Class<T>) type);
+			return new PreferenceEntityHandler<>(type);
 		} else if (field != null && Collection.class.isAssignableFrom(type)) {
 			return (PreferenceFieldHandler<T>) new CollectionFieldHandler<>(field);
 		} else if (Enum.class.isAssignableFrom(type)) {
 			return (PreferenceFieldHandler<T>) new EnumFieldHandler<>((Class<E>) type);
+		} else if (char.class.isAssignableFrom(type)) {
+			return (PreferenceFieldHandler<T>) new CharacterFieldHandler();
 		} else {
 			try {
-				return (PreferenceFieldHandler<T>) new ToStringFieldHandler<>(ClassUtils.primitiveToWrapper(type)
-						.getConstructor(String.class));
+				return new ToStringFieldHandler<>(
+						(Constructor<T>) ClassUtils.primitiveToWrapper(type).getConstructor(String.class));
 			} catch (final NoSuchMethodException e) {
 				if (Serializable.class.isAssignableFrom(Serializable.class)) {
 					return (PreferenceFieldHandler<T>) findExplicitHandler(field, SerializableFieldHandler.class);
@@ -216,7 +227,8 @@ public final class PreferenceFieldRegistry {
 	static <T> PreferenceFieldHandler<T> findHandler(final Field field,
 			final Class<? extends PreferenceFieldHandler<?>> handlerClass) {
 		if ((Class<?>) handlerClass == PreferenceFieldHandler.class) {
-			return findDefaultHandler(field, field.getType());
+			final Class<T> type = (Class<T>) field.getType();
+			return findDefaultHandler(field, type);
 		}
 		return findExplicitHandler(field, handlerClass);
 	}
@@ -325,15 +337,6 @@ public final class PreferenceFieldRegistry {
 			field.store(preferences, prefix, instance);
 		}
 	}
-
-	private static final Map<Class<?>, List<PreferenceFieldDescription<?>>> PREFERENCE_FIELDS = Collections
-			.synchronizedMap(new HashMap<Class<?>, List<PreferenceFieldDescription<?>>>());
-
-	private static final Map<Class<? extends PreferenceFieldHandler<?>>, PreferenceFieldHandler<?>> HANDLERS = Collections
-			.synchronizedMap(new HashMap<Class<? extends PreferenceFieldHandler<?>>, PreferenceFieldHandler<?>>());
-
-	private static final Map<Class<?>, Class<? extends PreferenceFieldHandler<?>>> DEFAULT_HANDLERS = Collections
-			.unmodifiableMap(createDefaultHandlers());
 
 	/**
 	 * Prevent creation.

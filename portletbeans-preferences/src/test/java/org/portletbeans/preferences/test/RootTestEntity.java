@@ -8,20 +8,16 @@ import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
 
-import org.portletbeans.preferences.PreferenceEntity;
 import org.portletbeans.preferences.PreferenceField;
 
 /**
- * Entity to test linked {@link PreferenceEntity}.
+ * Entity to test linked {@link ChildTestEntity child entities}.
  *
  * @author Tobias Liefke
  */
 @Getter
 @Setter
 public class RootTestEntity {
-
-	// This property is _not_ stored, as we have no PreferenceEntity annotation
-	private ChildTestEntity transientProperty;
 
 	@PreferenceField
 	private final List<ChildTestEntity> listProperty = new ArrayList<>();
@@ -31,5 +27,8 @@ public class RootTestEntity {
 
 	@PreferenceField
 	private ChildTestEntity childProperty;
+
+	// This property is _not_ stored, as we have no PreferenceEntity annotation on the class
+	private ChildTestEntity transientProperty;
 
 }
