@@ -54,6 +54,8 @@ public @interface StructureField {
 	 * <pre>
 	 *   &#64;StructureField(type = Type.TEXT_AREA)
 	 * </pre>
+	 *
+	 * @return type of the element (an array to allow "empty" = {@code null} value)
 	 */
 	Type[]type() default {};
 

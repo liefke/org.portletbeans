@@ -5,14 +5,14 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
+
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 
 /**
  * Represents one attribute for sorting.
@@ -24,29 +24,11 @@ import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
 public class DocumentAttribute implements Serializable {
 
 	/**
-	 * Constructs the complete fieldname for a custom field, as used in the lucene index.
-	 *
-	 * Only valid if the given field is a custom field.
-	 *
-	 * @param name
-	 *            the field name of the structure
-	 *
-	 * @param structure
-	 *            the structure
-	 * @param locale
-	 *            the locale of the current user
-	 * @return the complete field name
-	 */
-	public static final String toField(final String name, final DDMStructure structure, final Locale locale) {
-		return "ddm/" + structure.getStructureId() + '/' + name + "_" + LocaleUtil.toLanguageId(locale);
-	}
-
-	/**
 	 * The attribute to use, when sorting for title.
 	 */
 	public static final String TITLE_ATTRIBUTE = "title_sortable";
 
-	private static final long serialVersionUID = -3938497142904891064L;
+	private static final long serialVersionUID = 1L;
 
 	/**
 	 * The mapping from the data type to its sort type.
@@ -65,6 +47,24 @@ public class DocumentAttribute implements Serializable {
 		TYPE_MAPPING.put("long", Sort.LONG_TYPE);
 		TYPE_MAPPING.put("number", Sort.DOUBLE_TYPE);
 		TYPE_MAPPING.put("short", Sort.INT_TYPE);
+	}
+
+	/**
+	 * Constructs the complete fieldname for a custom field, as used in the lucene index.
+	 *
+	 * Only valid if the given field is a custom field.
+	 *
+	 * @param name
+	 *            the field name of the structure
+	 *
+	 * @param structure
+	 *            the structure
+	 * @param locale
+	 *            the locale of the current user
+	 * @return the complete field name
+	 */
+	public static final String toField(final String name, final DDMStructure structure, final Locale locale) {
+		return "ddm/" + structure.getStructureId() + '/' + name + "_" + LocaleUtil.toLanguageId(locale);
 	}
 
 	private final String name;
@@ -119,13 +119,12 @@ public class DocumentAttribute implements Serializable {
 	public DocumentAttribute(final String name, final DDMStructure structure) {
 		this.customField = true;
 		this.name = name;
-		Integer newType;
 		try {
-			newType = TYPE_MAPPING.get(structure.getFieldDataType(name));
+			final Integer newType = TYPE_MAPPING.get(structure.getFieldDataType(name));
+			this.type = newType == null ? Sort.INT_TYPE : newType;
 		} catch (final PortalException | SystemException e) {
 			throw new IllegalArgumentException(e);
 		}
-		this.type = newType == null ? Sort.INT_TYPE : newType;
 	}
 
 	/**

@@ -5,11 +5,11 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
+
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-
-import org.apache.commons.lang.StringUtils;
 
 /**
  * Represents one element from the {@link DynamicElements article content}.
@@ -83,6 +83,14 @@ public class DynamicElement extends DynamicElementsContainer {
 		/** A text box that only accepts numbers as inputs, but puts no constraints on the kind of number entered. */
 		DDM_NUMBER("ddm-number");
 
+		private static final Map<String, Type> TYPES = new HashMap<>();
+
+		static {
+			for (final Type type : values()) {
+				TYPES.put(type.id, type);
+			}
+		}
+
 		/**
 		 * Finds a type by its id.
 		 *
@@ -94,17 +102,11 @@ public class DynamicElement extends DynamicElementsContainer {
 			return TYPES.get(id);
 		}
 
-		private static final Map<String, Type> TYPES = new HashMap<>();
-
-		static {
-			for (final Type type : values()) {
-				TYPES.put(type.id, type);
-			}
-		}
-
+		/** Lower case name. */
 		private final String id;
 
-		private Type() {
+		/** Initialize lower case id from our (upper case) name. */
+		Type() {
 			this.id = name().toLowerCase();
 		}
 

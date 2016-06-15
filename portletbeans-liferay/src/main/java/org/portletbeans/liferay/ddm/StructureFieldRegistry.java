@@ -50,7 +50,7 @@ public final class StructureFieldRegistry {
 		/** The field that was marked as {@link TitleField} for an entity. */
 		private Field titleField;
 
-		/** All other fields */
+		/** All other fields. */
 		private final List<StructureFieldDescription<?>> fields;
 
 		private final List<Method> postConstructMethods;
@@ -430,6 +430,15 @@ public final class StructureFieldRegistry {
 		throw new IllegalArgumentException("Can't handle " + type + (field == null ? "" : " for field " + field));
 	}
 
+	/**
+	 * Builds the field handler for the given field.
+	 *
+	 * @param field
+	 *            the instpected field
+	 * @param handlerClass
+	 *            the configured handler class
+	 * @return the created handler
+	 */
 	static <T> StructureFieldHandler<T> findHandler(final Field field,
 			final Class<? extends StructureFieldHandler<?>> handlerClass) {
 		StructureFieldHandler<?> handler = HANDLERS.get(handlerClass);

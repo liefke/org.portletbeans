@@ -3,29 +3,16 @@
 
 <!--
     This configuration file was written by the eclipse-cs plugin configuration editor
-
-    Checkstyle-Configuration: PortletBeans Checkstyle Configuration
-    Description: The configuration for Checkstyle.
+-->
+<!--
+    Checkstyle-Configuration: PortletBeans
+    Description: 
+The checkstyle configuration for portletbeans.org
 -->
 <module name="Checker">
   <property name="severity" value="warning"/>
   <module name="TreeWalker">
     <module name="FileContentsHolder"/>
-    <module name="JavadocMethod">
-      <property name="scope" value="package"/>
-      <property name="excludeScope" value="private"/>
-      <property name="allowUndeclaredRTE" value="true"/>
-      <property name="allowThrowsTagsForSubclasses" value="true"/>
-      <property name="suppressLoadErrors" value="true"/>
-    </module>
-    <module name="JavadocVariable">
-      <property name="excludeScope" value="private"/>
-      <property name="scope" value="package"/>
-    </module>
-    <module name="JavadocStyle">
-      <property name="checkEmptyJavadoc" value="true"/>
-      <property name="tokens" value="INTERFACE_DEF,CLASS_DEF,METHOD_DEF,CTOR_DEF"/>
-    </module>
     <module name="ConstantName"/>
     <module name="LocalFinalVariableName"/>
     <module name="LocalVariableName"/>
@@ -104,11 +91,6 @@
     <module name="PackageDeclaration"/>
     <module name="OneStatementPerLine"/>
     <module name="CyclomaticComplexity"/>
-    <module name="JavadocType">
-      <property name="excludeScope" value="private"/>
-      <property name="scope" value="package"/>
-      <property name="authorFormat" value="[A-Z][a-z]+ [A-Z][a-z]+"/>
-    </module>
     <module name="TrailingComment">
       <property name="legalComment" value="^()|(NOSONAR.*)$"/>
     </module>
@@ -187,6 +169,27 @@
       <metadata name="net.sf.eclipsecs.core.comment" value="Avoid commented-out lines of code"/>
       <property name="format" value="^\s*//.*\);.*$"/>
       <property name="message" value="Avoid commented-out lines of code"/>
+    </module>
+    <module name="JavadocMethod">
+      <property name="scope" value="package"/>
+      <property name="excludeScope" value="private"/>
+      <property name="allowUndeclaredRTE" value="true"/>
+      <property name="allowThrowsTagsForSubclasses" value="true"/>
+      <property name="allowMissingParamTags" value="true"/>
+      <property name="logLoadErrors" value="false"/>
+      <property name="suppressLoadErrors" value="true"/>
+    </module>
+    <module name="JavadocVariable">
+      <property name="excludeScope" value="private"/>
+      <property name="scope" value="package"/>
+    </module>
+    <module name="JavadocStyle">
+      <property name="checkEmptyJavadoc" value="true"/>
+    </module>
+    <module name="JavadocType">
+      <property name="excludeScope" value="private"/>
+      <property name="scope" value="package"/>
+      <property name="authorFormat" value="[A-Z][a-z]+( [A-Z][a-z]+)+"/>
     </module>
   </module>
   <module name="Translation"/>

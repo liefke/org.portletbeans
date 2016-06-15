@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+
+<f:view xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:aui="http://liferay.com/faces/aui">
+	<h:body>
+		<aui:form id="form">
+			<h2>Configuration</h2>
+
+			<aui:fieldset label="Basic properties" id="basic">
+				<aui:field label="Text">
+					<h:inputText id="text" value="#{exampleBean.text}" />
+				</aui:field>
+				<aui:field label="Number">
+					<h:inputText id="number" value="#{exampleBean.number}" />
+				</aui:field>
+				<aui:field label="Enabled">
+					<h:inputText id="enabled" value="#{exampleBean.enabled}" />
+				</aui:field>
+			</aui:fieldset>
+			<h:commandButton id="cancel" value="Cancel" action="#{exampleBean.view()}" />
+			<h:commandButton id="save" value="Ok" action="#{exampleBean.storeAndView()}" />
+			<h:commandButton id="apply" value="Apply" action="#{exampleBean.store()}" />
+		</aui:form>
+	</h:body>
+</f:view>
